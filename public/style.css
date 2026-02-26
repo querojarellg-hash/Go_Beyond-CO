@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #f4f1ed;
+}
+
+header {
+  background: #3e2723;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+.primary { background: #3e2723; color: white; }
+.success { background: #4caf50; color: white; }
+.danger { background: #e53935; color: white; }
+.accent { background: #c49a6c; color: white; }
+
+.card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  padding: 15px;
+  margin: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 20px;
+}
