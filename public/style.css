@@ -1,7 +1,7 @@
 body {
-  margin: 0;
   font-family: 'Poppins', sans-serif;
   background: #f4f1ed;
+  margin: 0;
 }
 
 header {
@@ -11,28 +11,43 @@ header {
   text-align: center;
 }
 
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
+.container {
+  padding: 20px;
 }
-
-.primary { background: #3e2723; color: white; }
-.success { background: #4caf50; color: white; }
-.danger { background: #e53935; color: white; }
-.accent { background: #c49a6c; color: white; }
 
 .card {
   background: white;
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  padding: 15px;
-  margin: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-  gap: 20px;
+button {
+  background: #c49a6c;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th, .order-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
 }
