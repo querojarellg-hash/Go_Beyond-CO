@@ -1,36 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Go Beyond Cafe</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <title>Go Beyond Cafe</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-<h1>Go Beyond Cafe</h1>
-<p>Mabilao, San Fabian • 8AM - 8PM</p>
+  <h1>☕ Go Beyond Cafe</h1>
 </header>
 
-<div style="padding:20px">
-<div class="grid" id="menu"></div>
-
-<div class="card">
-<h3>Your Order</h3>
-<input id="customer" placeholder="Your Name"><br><br>
-<button onclick="setType('Dine In')" class="accent">Dine In</button>
-<button onclick="setType('Take Out')" class="accent">Take Out</button>
-
-<ul id="cart"></ul>
-<h3>Total ₱<span id="total">0</span></h3>
-
-<button onclick="checkout('Cash')" class="primary">Pay Cash</button>
-<button onclick="checkout('GCash')" class="success">GCash</button>
-<button onclick="checkout('PayMaya')" class="success">PayMaya</button>
-</div>
+<div class="container" id="welcomeScreen">
+  <div class="card">
+    <h2>Welcome to Go Beyond Cafe</h2>
+    <p>Experience premium café dining.</p>
+    <button onclick="startOrder()">Start Order</button>
+  </div>
 </div>
 
-<script src="app.js"></script>
+<div class="container" id="menuScreen" style="display:none;">
+  <div class="card">
+    <h3>Menu</h3>
+    <div class="menu-item">
+      <span>Latte</span>
+      <span>₱120 <button onclick="addItem('Latte',120)">Add</button></span>
+    </div>
+    <div class="menu-item">
+      <span>Cappuccino</span>
+      <span>₱130 <button onclick="addItem('Cappuccino',130)">Add</button></span>
+    </div>
+    <div class="menu-item">
+      <span>Chocolate Cake</span>
+      <span>₱150 <button onclick="addItem('Chocolate Cake',150)">Add</button></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Cart</h3>
+    <div id="cartItems"></div>
+    <h4>Total: ₱<span id="total">0</span></h4>
+    <button onclick="checkout()">Place Order</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
