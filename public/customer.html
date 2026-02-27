@@ -1,149 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Go Beyond Cafe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<title>Go Beyond Cafe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- WELCOME SCREEN -->
-<div id="welcomeScreen" class="welcome">
-  <div class="welcome-card">
-    <h1>☕ Go Beyond Cafe</h1>
-    <p>Premium coffee. Cozy vibes. Great moments.</p>
-    <button onclick="startOrder()">Start Order</button>
-  </div>
+<div class="hero" id="welcomeScreen">
+<h1>☕ Go Beyond Cafe</h1>
+<p>Premium handcrafted coffee experience.</p>
+<button onclick="startOrder()">Start Order</button>
 </div>
 
-<!-- ORDERING SCREEN -->
 <div id="orderScreen" style="display:none;">
+<header>
+<h2>Our Menu</h2>
+</header>
 
-  <header>
-    <h2>Place Your Order</h2>
-  </header>
+<div class="container">
+<div id="menuList"></div>
 
-  <div class="container">
-
-    <!-- CUSTOMER INFO -->
-    <div class="card">
-      <h3>Your Details</h3>
-
-      <input type="text" id="customerName" placeholder="Enter your name">
-
-      <div class="order-type">
-        <label>
-          <input type="radio" name="type" value="Dine In" checked>
-          Dine In
-        </label>
-        <label>
-          <input type="radio" name="type" value="Take Out">
-          Take Out
-        </label>
-      </div>
-    </div>
-
-    <!-- MENU -->
-    <div class="card">
-      <h3>Menu</h3>
-      <div id="menuList"></div>
-    </div>
-
-    <!-- CART -->
-    <div class="card">
-      <h3>Your Orders</h3>
-      <div id="cartItems"></div>
-      <h4>Total: ₱<span id="total">0</span></h4>
-      <button class="send-btn" onclick="sendOrder()">Send Order</button>
-    </div>
-
-  </div>
+<div class="card">
+<h3>Total: ₱<span id="total">0</span></h3>
+<button onclick="checkout()">Place Order</button>
+</div>
+</div>
 </div>
 
-<script>
-
-let cart = [];
-let total = 0;
-
-/* START ORDER */
-function startOrder(){
-  document.getElementById("welcomeScreen").style.display = "none";
-  document.getElementById("orderScreen").style.display = "block";
-  loadMenu();
-}
-
-/* LOAD MENU FROM DATABASE */
-function loadMenu(){
-  fetch("/menu")
-  .then(res => res.json())
-  .then(data => {
-    const menuDiv = document.getElementById("menuList");
-    menuDiv.innerHTML = "";
-    data.forEach(item => {
-      menuDiv.innerHTML += `
-        <div class="menu-item">
-          <span>${item.name} - ₱${item.price}</span>
-          <button onclick="addItem('${item.name}', ${item.price})">Add</button>
-        </div>
-      `;
-    });
-  });
-}
-
-/* ADD TO CART */
-function addItem(name, price){
-  cart.push({name, price});
-  total += price;
-  updateCart();
-}
-
-/* UPDATE CART UI */
-function updateCart(){
-  const cartDiv = document.getElementById("cartItems");
-  cartDiv.innerHTML = "";
-  cart.forEach(item => {
-    cartDiv.innerHTML += `<p>${item.name} - ₱${item.price}</p>`;
-  });
-  document.getElementById("total").innerText = total;
-}
-
-/* SEND ORDER */
-function sendOrder(){
-
-  const customer = document.getElementById("customerName").value;
-  const type = document.querySelector('input[name="type"]:checked').value;
-
-  if(!customer){
-    alert("Please enter your name");
-    return;
-  }
-
-  if(cart.length === 0){
-    alert("Your cart is empty");
-    return;
-  }
-
-  fetch("/order", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      customer,
-      type,
-      items: cart,
-      total,
-      payment: "Cash"
-    })
-  })
-  .then(res => res.json())
-  .then(() => {
-    alert("Order Sent Successfully!");
-    cart = [];
-    total = 0;
-    updateCart();
-  });
-}
-
-</script>
+<script src="app.js"></script>
 </body>
 </html>
