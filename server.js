@@ -9,12 +9,21 @@ const QRCode = require("qrcode");
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 const SECRET = "supersecretkey";
-const db = new sqlite3.Database("./database.db");
 
 /* ================= DATABASE ================= */
+
+// Always create database in project root (Render writable)
+const dbPath = path.join(__dirname, "database.db");
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("Database error:", err);
+  } else {
+    console.log("Database connected");
+  }
+});
 
 db.serialize(() => {
 
@@ -44,7 +53,7 @@ db.serialize(() => {
     if(!row){
       const hash = await bcrypt.hash("admin123",10);
       db.run("INSERT INTO admin(username,password) VALUES(?,?)",["admin",hash]);
-      console.log("Default Admin: admin / admin123");
+      console.log("Default admin created");
     }
   });
 
@@ -54,6 +63,7 @@ db.serialize(() => {
       db.run("INSERT INTO menu(name,price) VALUES('Caramel Latte',150)");
       db.run("INSERT INTO menu(name,price) VALUES('Cappuccino',140)");
       db.run("INSERT INTO menu(name,price) VALUES('Chocolate Cake',160)");
+      console.log("Default menu created");
     }
   });
 
@@ -74,18 +84,28 @@ function auth(req,res,next){
 
 /* ================= ROUTES ================= */
 
-app.get("/",(req,res)=>res.sendFile(path.join(__dirname,"public/customer.html")));
-app.get("/admin",(req,res)=>res.sendFile(path.join(__dirname,"public/admin.html")));
+app.get("/",(req,res)=>{
+  res.sendFile(path.join(__dirname,"public/customer.html"));
+});
+
+app.get("/admin",(req,res)=>{
+  res.sendFile(path.join(__dirname,"public/admin.html"));
+});
 
 app.get("/generate-qr",async(req,res)=>{
-  const url = `${req.protocol}://${req.get("host")}`;
-  const qr = await QRCode.toDataURL(url);
-  res.json({qr});
+  try{
+    const url = `${req.protocol}://${req.get("host")}`;
+    const qr = await QRCode.toDataURL(url);
+    res.json({qr});
+  }catch(e){
+    res.status(500).json({error:"QR generation failed"});
+  }
 });
 
 app.post("/login",(req,res)=>{
   db.get("SELECT * FROM admin WHERE username=?",[req.body.username],
   async(err,row)=>{
+    if(err) return res.status(500).json({msg:"DB error"});
     if(!row) return res.json({msg:"User not found"});
     const valid = await bcrypt.compare(req.body.password,row.password);
     if(!valid) return res.json({msg:"Wrong password"});
@@ -95,7 +115,10 @@ app.post("/login",(req,res)=>{
 });
 
 app.get("/menu",(req,res)=>{
-  db.all("SELECT * FROM menu",[],(err,rows)=>res.json(rows));
+  db.all("SELECT * FROM menu",[],(err,rows)=>{
+    if(err) return res.status(500).json({msg:"DB error"});
+    res.json(rows);
+  });
 });
 
 app.post("/order",(req,res)=>{
@@ -103,12 +126,16 @@ app.post("/order",(req,res)=>{
   db.run(
     "INSERT INTO orders(orderNumber,items,total) VALUES(?,?,?)",
     [orderNumber,JSON.stringify(req.body.items),req.body.total],
-    ()=>res.json({msg:"Order saved"})
+    (err)=>{
+      if(err) return res.status(500).json({msg:"Insert failed"});
+      res.json({msg:"Order saved"});
+    }
   );
 });
 
 app.get("/orders",auth,(req,res)=>{
   db.all("SELECT * FROM orders ORDER BY id DESC",[],(err,rows)=>{
+    if(err) return res.status(500).json({msg:"DB error"});
     rows.forEach(r=>r.items=JSON.parse(r.items));
     res.json(rows);
   });
@@ -117,10 +144,16 @@ app.get("/orders",auth,(req,res)=>{
 app.post("/order/status/:id",auth,(req,res)=>{
   db.run("UPDATE orders SET status=? WHERE id=?",
   [req.body.status,req.params.id],
-  ()=>res.json({msg:"Updated"});
+  (err)=>{
+    if(err) return res.status(500).json({msg:"Update failed"});
+    res.json({msg:"Updated"});
+  });
 });
 
-/* ================= START SERVER ================= */
+/* ================= START ================= */
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT,()=>console.log("Server running on "+PORT));
+
+app.listen(PORT,()=>{
+  console.log("Server running on port " + PORT);
+});
